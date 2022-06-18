@@ -13,12 +13,15 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('donation_transactions', function (Blueprint $table) {
+        Schema::create('transactions', function (Blueprint $table) {
             $table->id();
             $table->foreignId('from_user_id')->constrained('users');
             $table->foreignId('to_user_id')->constrained('users');
+            $table->enum('type', ['donation', 'expense']);
+            $table->foreignId('issued_by')->constrained('users')->nullable();
             $table->foreignId('currency_id')->constrained('currencies');
             $table->text('title');
+            $table->text('description');
             $table->float('amount');
             $table->timestamps();
         });
@@ -31,6 +34,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('donation_transactions');
+        Schema::dropIfExists('transactions');
     }
 };
