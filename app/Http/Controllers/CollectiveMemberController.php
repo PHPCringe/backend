@@ -2,84 +2,70 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\CollectiveMember;
 use Illuminate\Http\Request;
+use App\Models\CollectiveMember;
+use Illuminate\Validation\Rules\Enum;
+use App\Enums\OrganizationMemberTypes;
+use Illuminate\Support\Facades\Validator;
 
 class CollectiveMemberController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function index()
     {
-        Collect
+        $collectiveMember = CollectiveMember::all();
+        return $this->responseJson(200, "Success", $collectiveMember);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function create()
     {
         //
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
+    public function addMember(Request $request)
     {
-        //
+        $validation = Validator::make($request->all(), [
+            'collective_id' => 'required',
+            'user_id' => 'required',
+            'role' => ['required', new Enum(OrganizationMemberTypes::class)],
+        ]);
+
+        if ($validation->fails()) {
+            return $this->responseJson(422, 'Invalid data', $validation->errors());
+        }
+
+        $getCollectiveMembers = CollectiveMember::where('collective_id', $request->collective_id)->where('user_id', $request->user_id)->get();
+
+        if ($getCollectiveMembers->count() > 0) {
+            return $this->responseJson(422, 'User already exists in this collective');
+        }
+
+        $collectiveMember = CollectiveMember::create([
+            'collective_id' => $request->collective_id,
+            'user_id' => $request->user_id,
+            'role' => $request->role,
+        ]);
+
+        return $this->responseJson(201, "succesfully added user to collective", $collectiveMember);
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\CollectiveMember  $collectiveMember
-     * @return \Illuminate\Http\Response
-     */
     public function show(CollectiveMember $collectiveMember)
     {
         //
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\CollectiveMember  $collectiveMember
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(CollectiveMember $collectiveMember)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\CollectiveMember  $collectiveMember
-     * @return \Illuminate\Http\Response
-     */
     public function update(Request $request, CollectiveMember $collectiveMember)
     {
         //
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\CollectiveMember  $collectiveMember
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(CollectiveMember $collectiveMember)
+    public function removeMember(Request $request, CollectiveMember $collectiveMember)
     {
-        //
+        // $collectiveMember = CollectiveMember::where('collective_id', $request->collective_id)->where('user_id', $request->user_id)->delete();
+        $collectiveMember = CollectiveMember::find($request->route('member'));
+        if($collectiveMember == null) {
+            return $this->responseJson(404, "Member not found");
+        }
+        $collectiveMember->delete();
+        return $this->responseJson(200, "Success delete member", $collectiveMember);
     }
 }

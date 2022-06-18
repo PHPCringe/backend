@@ -7,11 +7,6 @@ use Illuminate\Http\Request;
 
 class CollectiveTagController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function index(Request $request)
     {
         $search = $request->get('search');
@@ -21,12 +16,6 @@ class CollectiveTagController extends Controller
         return $this->responseJson(200, "Success get tags", $tags);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
         $name = $request->name;

@@ -1,14 +1,15 @@
 <?php
 
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\CollectiveController;
-use App\Http\Controllers\DiscoverController;
-// use App\Http\Controllers\DonationTransactionController;
-use App\Http\Controllers\TransactionDonationController;
-use App\Http\Controllers\TransactionExpenseController;
-use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuthController;
+// use App\Http\Controllers\DonationTransactionController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\DiscoverController;
+use App\Http\Controllers\CollectiveController;
+use App\Http\Controllers\CollectiveMemberController;
+use App\Http\Controllers\TransactionExpenseController;
+use App\Http\Controllers\TransactionDonationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -40,20 +41,19 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
             ->name('verification.verify');
     });
 
+    // USER
     Route::get('/user/{user}', [UserController::class, 'profile']);
 
+    // DISCOVER
     Route::get('/discover', [DiscoverController::class, 'discover']);
 
+    // COLLECTIVES
     Route::get('collectives', [CollectiveController::class, 'index']);
-
     Route::post('collectives', [CollectiveController::class, 'store']);
     Route::get('collectives/{collective}', [CollectiveController::class, 'show']);
-
     Route::middleware('auth:sanctum')->group(function () {
         Route::delete('collectives/{collective}', [CollectiveController::class, 'destroy']);
     });
-
-
     Route::prefix('collectives/{collective}')->group(function () {
         Route::get('/donate', [CollectiveController::class, 'donate']);
         Route::get('/available-payments', [CollectiveController::class, 'available_payments']);
@@ -66,5 +66,11 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
             Route::get('/{expense}', [TransactionExpenseController::class, 'show']);
             Route::post('/', [TransactionExpenseController::class, 'store'])->middleware('auth:sanctum');
         });
+    });
+
+    Route::prefix('member/collective')->group(function () {
+        Route::get('/', [CollectiveMemberController::class, 'index']);
+        Route::post('/', [CollectiveMemberController::class, 'addMember']);
+        Route::delete('/{member}', [CollectiveMemberController::class, 'removeMember']);
     });
 });
