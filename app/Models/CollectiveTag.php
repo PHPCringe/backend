@@ -7,5 +7,14 @@ use Illuminate\Database\Eloquent\Model;
 
 class CollectiveTag extends Model
 {
+    protected $fillable = [
+        'name',
+        'collective_id'
+    ];
     use HasFactory;
+
+    public function collective()
+    {
+        return $this->belongsTo(Collective::class);
+    }
 }

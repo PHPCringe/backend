@@ -12,19 +12,13 @@ class CollectiveTagController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
-    }
+        $search = $request->get('search');
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
+        $tags = CollectiveTag::where('name', 'LIKE', "%{$search}%")->get();
+
+        return $this->responseJson(200, "Success get tags", $tags);
     }
 
     /**
@@ -35,51 +29,19 @@ class CollectiveTagController extends Controller
      */
     public function store(Request $request)
     {
-        //
-    }
+        $name = $request->name;
+        $collective_id = $request->collective_id;
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\CollectiveTag  $collectiveTag
-     * @return \Illuminate\Http\Response
-     */
-    public function show(CollectiveTag $collectiveTag)
-    {
-        //
-    }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\CollectiveTag  $collectiveTag
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(CollectiveTag $collectiveTag)
-    {
-        //
-    }
+        $tags = [];
+        foreach($name as $tag) {
+            array_push($tags, [
+                'name' => $tag,
+                'collective_id' => $collective_id
+            ]);
+        }
+        $create = CollectiveTag::insert($tags);
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\CollectiveTag  $collectiveTag
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, CollectiveTag $collectiveTag)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\CollectiveTag  $collectiveTag
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(CollectiveTag $collectiveTag)
-    {
-        //
+        return $this->responseJson(201, "Success add tag", []);
     }
 }

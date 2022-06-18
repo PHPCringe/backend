@@ -19,7 +19,7 @@ return new class extends Migration
             $table->foreignId('to_user_id')->constrained('users');
             $table->enum('type', ['donation', 'expense']);
             $table->foreignId('issued_by')->constrained('users')->nullable();
-            $table->foreignId('currency_id')->constrained('currencies');
+            $table->foreignId('contribution_type_id')->constrained('contribution_types');
             $table->text('title');
             $table->text('description');
             $table->float('amount');

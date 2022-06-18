@@ -1,7 +1,12 @@
 <?php
 
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CollectiveController;
 use App\Http\Controllers\DiscoverController;
-use App\Http\Controllers\DonationTransactionController;
+// use App\Http\Controllers\DonationTransactionController;
+use App\Http\Controllers\TransactionDonationController;
+use App\Http\Controllers\TransactionExpenseController;
+use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -27,16 +32,23 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
         Route::post('/register', [AuthController::class, 'register']);
     });
 
-    Route::get('/user/{user}', [AuthController::class, 'profile']);
+    Route::get('/user/{user}', [UserController::class, 'profile']);
 
     Route::get('/discover', [DiscoverController::class, 'discover']);
 
-    Route::resource('collectives', CollectiveController::class);
+    Route::get('collectives', [CollectiveController::class, 'index']);
+
+    Route::post('collectives', [CollectiveController::class, 'store']);
+    Route::get('collectives/{collective}', [CollectiveController::class, 'show']);
+
+    Route::middleware('auth:sanctum')->group(function () {    
+        Route::delete('collectives/{collective}', [CollectiveController::class, 'destroy']);
+    });
+
+
     Route::prefix('collectives/{collective}')->group(function () {
         Route::get('/donate', [CollectiveController::class, 'donate']);
-
         Route::get('/available-payments', [CollectiveController::class, 'available_payments']);
-
         Route::group(['prefix' => 'donations'], function () {
             Route::get('/{donation}', [TransactionDonationController::class, 'show']);
             Route::post('/', [TransactionDonationController::class, 'store'])->middleware('auth:sanctum');
