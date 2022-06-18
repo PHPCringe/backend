@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\UserTypes;
 use App\Models\User;
 use App\Models\Collective;
 use Illuminate\Support\Str;
@@ -10,6 +11,7 @@ use App\Models\CollectiveTag;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rules\Enum;
 
 class CollectiveController extends Controller
 {
@@ -44,14 +46,14 @@ class CollectiveController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'required',
-            'email' => 'required|unique:users',
-            'type' => 'required',
-            'bio' => 'required',
-            'is_profit' => 'required',
-            'description' => 'required',
-            'website' => 'required',
-            'twitter' => 'required',
+            'name' => 'required|string',
+            'email' => 'required|string|email|unique:users',
+            'type' => ['required', new Enum(UserTypes::class)],
+            'bio' => 'required|string',
+            'is_profit' => 'required|boolean',
+            'description' => 'required|string',
+            'website' => 'required|url',
+            'twitter' => 'required|string',
             'tags' => 'required|array'
         ]);
 
@@ -115,11 +117,7 @@ class CollectiveController extends Controller
             return $this->responseJson(404, "Collective not found");
         }
 
-        return $this->responseJson(200, 'Collective data found', [
-            'collective' => $collective,
-            'members' => $collective->members,
-            'tags' => $collective->tags,
-        ]);
+        return $this->responseJson(200, 'Collective data found', $collective);
     }
 
     /**
