@@ -13,19 +13,17 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('users', function (Blueprint $table) {
+        Schema::create('collectives', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
-            $table->enum('type', ['project', 'collective', 'event', 'organization','personal']);
-            $table->text('avatar_url');
-            $table->rememberToken();
+            $table->foreignId('user_id')->constrained('users');
+            $table->text('bio');
+            $table->text('description');
+            $table->text('website');
+            $table->text('twitter');
             $table->timestamps();
         });
     }
-
+    
     /**
      * Reverse the migrations.
      *
@@ -33,6 +31,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('users');
+        Schema::dropIfExists('collectives');
     }
 };
