@@ -18,7 +18,7 @@ return new class extends Migration
             $table->foreignId('collective_id')->constrained('collectives');
             $table->text('name');
             $table->text('description');
-            $table->cost('float')->default(0);
+            $table->float('cost')->default(0);
             $table->foreignId('currency_id')->constrained('currencies');
             $table->enum('type', ['monthly','annually','onetime']);
             $table->boolean('is_recurring');
