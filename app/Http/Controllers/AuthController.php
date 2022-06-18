@@ -2,24 +2,34 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\UserTypes;
 use App\Models\User;
+use Illuminate\Auth\Events\Verified;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rules\Enum;
 
 class AuthController extends Controller
 {
     public function register(Request $request)
     {
-        // $request->validate([
-        //     'name' => 'required|string|max:255',
-        //     'email' => 'required|string|email|max:255|unique:users',
-        //     'password' => 'required|string',
-        //     'type' => 'required|'
-        // ])
+        $validation = Validator::make($request->all(), [
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string',
+            'type' => ['required', new Enum(UserTypes::class)],
+        ]);
 
-        $username = $request->type == 'personal' ? "user-" . $request->name : $request->name;
+        if ($validation->fails()) {
+            return $this->responseJson(422, 'Invalid data', $validation->errors());
+        }
+
+        $username = $request->type == UserTypes::PERSONAL
+            ? "user-" . $request->name
+            : $request->name;
 
         $createdUser = User::create([
             'name' => $request->name,
@@ -32,7 +42,7 @@ class AuthController extends Controller
 
         $accessToken = $createdUser->createToken('access_token')->plainTextToken;
 
-        return $this->responseJson(201, 'Successfully registered a new account', [
+        return $this->responseJson(201, 'Successfully registered a new account, Verification link has been sent to your email address', [
             'user' => $createdUser,
             'access_token' => $accessToken,
         ]);
@@ -48,5 +58,29 @@ class AuthController extends Controller
         $accessToken = $user->createToken('access_token')->plainTextToken;
 
         return $this->responseJson(200, 'Successfully logged in', $accessToken);
+    }
+
+    public function sendVerificationEmail(Request $request)
+    {
+        if ($request->user()->hasVerifiedEmail()) {
+            return $this->responseJson(200, 'Email already verified');
+        }
+
+        $request->user()->sendVerificationEmail();
+
+        return $this->responseJson(200, 'Verification email has been sent');
+    }
+
+    public function verifyEmailAddress(Request $request)
+    {
+        if ($request->user()->hasVerifiedEmail()) {
+            return $this->responseJson(200, 'Email has been verified');
+        }
+
+        if ($request->user()->markEmailAsVerified()) {
+            event(new Verified($request->user()));
+        }
+
+        return $this->responseJson(200, 'Email has been verified');
     }
 }

@@ -30,6 +30,14 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
     Route::prefix('auth')->group(function () {
         Route::post('/login', [AuthController::class, 'login']);
         Route::post('/register', [AuthController::class, 'register']);
+
+        Route::get('/email/verify', [AuthController::class, 'sendVerificationEmail'])
+            ->middleware('auth:sanctum')
+            ->name('verification.notice');
+
+        Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verifyEmailAddress'])
+            ->middleware('auth:sanctum')
+            ->name('verification.verify');
     });
 
     Route::get('/user/{user}', [UserController::class, 'profile']);
@@ -41,7 +49,7 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
     Route::post('collectives', [CollectiveController::class, 'store']);
     Route::get('collectives/{collective}', [CollectiveController::class, 'show']);
 
-    Route::middleware('auth:sanctum')->group(function () {    
+    Route::middleware('auth:sanctum')->group(function () {
         Route::delete('collectives/{collective}', [CollectiveController::class, 'destroy']);
     });
 
