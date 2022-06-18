@@ -13,7 +13,9 @@ class Collective extends Model
         'is_profit',
         'description',
         'website',
+        'donation_goal',
         'twitter',
+        'tags'
     ];
     use HasFactory;
 

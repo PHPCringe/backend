@@ -14,7 +14,7 @@ class CollectiveMemberController extends Controller
      */
     public function index()
     {
-        //
+        Collect
     }
 
     /**

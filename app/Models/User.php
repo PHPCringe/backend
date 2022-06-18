@@ -46,4 +46,13 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function collective()
+    {
+        return $this->hasOne(Collective::class);
+    }
+
+    public function collectiveMember()
+    {
+    }
 }

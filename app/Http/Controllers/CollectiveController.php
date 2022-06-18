@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Collective;
-use App\Models\CollectiveTag;
 use App\Models\User;
+use App\Models\Collective;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use App\Models\CollectiveTag;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
 class CollectiveController extends Controller
@@ -43,14 +45,14 @@ class CollectiveController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required',
-            'email' => 'required',
+            'email' => 'required|unique:users',
             'type' => 'required',
             'bio' => 'required',
             'is_profit' => 'required',
             'description' => 'required',
             'website' => 'required',
             'twitter' => 'required',
-            'tags' => 'required|type:array'
+            'tags' => 'required|array'
         ]);
 
         if ($validator->fails()) {
@@ -59,8 +61,9 @@ class CollectiveController extends Controller
 
         $user = User::create([
             'name' => $request->name,
-            'username' => $request->username,
+            'username' => Str::slug($request->name),
             'email' => $request->email,
+            'password' => Hash::make($request->password),
             'type' => $request->type,
             'avatar_url' => 'avatar.png'
         ]);
@@ -70,11 +73,11 @@ class CollectiveController extends Controller
             'bio' => $request->bio,
             'description' => $request->description,
             'website' => $request->website,
+            'twitter' => $request->twitter
         ]);
 
         $tags = [];
-
-        foreach ($tags as $tag) {
+        foreach ($request->tags as $tag) {
             array_push($tags, [
                 'name' => $tag,
                 'collective_id' => $collective->id
@@ -90,17 +93,28 @@ class CollectiveController extends Controller
                 'role' => 'admin'
             ]);
         }
-        $this->responseJson(201, "collective created", $collective);
+
+        return $this->responseJson(201, "collective created", $collective);
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Collective  $collective
+     * @param  \App\Models\Collective  $
+     * collective
      * @return \Illuminate\Http\Response
-     */
-    public function show(Collective $collective, string $collectiveId)
+     * **/
+
+    public function show(string $username)
     {
+        $collective = User::with(['collective.members', 'collective.tags'])
+            ->where('username', $username)
+            ->first();
+
+        if (!$collective) {
+            return $this->responseJson(404, "Collective not found");
+        }
+
         return $this->responseJson(200, 'Collective data found', [
             'collective' => $collective,
             'members' => $collective->members,

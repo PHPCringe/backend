@@ -20,6 +20,7 @@ return new class extends Migration
             $table->boolean('is_profit')->default(false);
             $table->text('description');
             $table->text('website');
+            $table->float('donation_goal')->default(0);
             $table->text('twitter');
             $table->timestamps();
         });
