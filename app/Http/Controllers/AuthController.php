@@ -66,20 +66,14 @@ class AuthController extends Controller
             return $this->responseJson(200, 'Email already verified');
         }
 
-        $request->user()->sendVerificationEmail();
+        $request->user()->sendEmailVerificationNotification();
 
         return $this->responseJson(200, 'Verification email has been sent');
     }
 
     public function verifyEmailAddress(Request $request)
     {
-        if ($request->user()->hasVerifiedEmail()) {
-            return $this->responseJson(200, 'Email has been verified');
-        }
-
-        if ($request->user()->markEmailAsVerified()) {
-            event(new Verified($request->user()));
-        }
+        $request->fullfill();
 
         return $this->responseJson(200, 'Email has been verified');
     }
