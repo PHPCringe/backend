@@ -5,16 +5,16 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Currency extends Model
+class Wallet extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'name',
-        'symbol'
+        'user_id',
+        'currency_id',
+        'account_id',
+        'account_holder',
+        'account_number',
+        'balance',
     ];
-
-    public function user() {
-        return $this->belongsTo(User::class);
-    }
 }

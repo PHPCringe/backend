@@ -10,6 +10,7 @@ use App\Http\Controllers\CollectiveController;
 use App\Http\Controllers\CollectiveMemberController;
 use App\Http\Controllers\TransactionExpenseController;
 use App\Http\Controllers\TransactionDonationController;
+use App\Http\Controllers\WalletController;
 
 /*
 |--------------------------------------------------------------------------
@@ -72,5 +73,12 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
             Route::post('/', [CollectiveMemberController::class, 'addMember']);
             Route::delete('/{member}', [CollectiveMemberController::class, 'removeMember']);
         });
+    });
+
+    Route::prefix('wallets')->group(function () {
+        Route::post('/otp/{ewallet}', [WalletController::class, 'sendEWalletOTP'])
+            ->middleware('auth:sanctum');
+        Route::post('/register', [WalletController::class, 'registerWallet'])
+            ->middleware('auth:sanctum');
     });
 });
