@@ -28,7 +28,7 @@ class AuthServiceProvider extends ServiceProvider
         $this->registerPolicies();
 
         VerifyEmail::toMailUsing(function ($notifiable, $url) {
-            $spaURL = env("SPA_URL", "localhost:3333") . "/auth/email/verify?verification_url" . $url;
+            $spaURL = env("SPA_URL", "localhost:3333") . "/auth/email/verify?url=" . $url;
 
             return (new MailMessage)
                 ->subject('Confirm your email addresss')
