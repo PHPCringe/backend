@@ -14,10 +14,10 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
+        $this->call(CurrencySeeder::class);
         $this->call(UserSeeder::class);
         $this->call(CollectiveSeeder::class);
         $this->call(CollectiveTagSeeder::class);
-        $this->call(CurrencySeeder::class);
         $this->call(ContributionTypeSeeder::class);
         $this->call(CollectiveMemberSeeder::class);
         // $this->call(TransactionSeeder::class);

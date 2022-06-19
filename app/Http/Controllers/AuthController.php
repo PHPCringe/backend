@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Validation\Rules\Enum;
 
 class AuthController extends Controller
@@ -37,7 +38,7 @@ class AuthController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'type' => $request->type,
-            'avatar_url' => "avatar.png"
+            'avatar_url' => "avatar.png",
         ]);
 
         $accessToken = $createdUser->createToken('access_token')->plainTextToken;
@@ -57,7 +58,14 @@ class AuthController extends Controller
         $user = User::where('email', $request->email)->firstOrFail();
         $accessToken = $user->createToken('access_token')->plainTextToken;
 
-        return $this->responseJson(200, 'Successfully logged in', $accessToken);
+        $response = Http::withBasicAuth(env('BRICK_ID'), env('BRICK_SECRET'))
+            ->get(env('BRICK_URL') . '/auth/token');
+
+        return $this->responseJson(200, 'Successfully logged in', [
+            'user' => $user,
+            'access_token' => $accessToken,
+            'brick_token' => $response->json()['data']['access_token'],
+        ]);
     }
 
     public function sendVerificationEmail(Request $request)

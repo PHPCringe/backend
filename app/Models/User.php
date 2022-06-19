@@ -26,6 +26,8 @@ class User extends Authenticatable implements MustVerifyEmail
         'type',
         'avatar_url',
         'remember_token',
+        'balance',
+        'currency_id',
     ];
 
     /**
@@ -52,7 +54,8 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasOne(Collective::class);
     }
 
-    public function collectiveMember()
+    public function currency()
     {
+        return $this->hasOne(Currency::class);
     }
 }
