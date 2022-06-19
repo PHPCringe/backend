@@ -18,8 +18,9 @@ class DiscoverController extends Controller
         //     ->orderBy($sortBy, $sort)
         //     ->paginate();
 
-        $collectives = User::with(['collective'])
-            ->where('username', 'LIKE', '%' . $search . '%')
+        $collectives = User::with(['collective', 'collective.tags'])
+            ->where('type', '!=', 'personal')
+            ->where('name', 'LIKE', '%' . $search . '%')
             ->orderBy($sortBy, $sort)
             ->paginate();
 
