@@ -23,14 +23,15 @@ class CollectiveTagController extends Controller
 
 
         $tags = [];
-        foreach($name as $tag) {
+        foreach ($name as $tag) {
             array_push($tags, [
                 'name' => $tag,
                 'collective_id' => $collective_id
             ]);
         }
-        $create = CollectiveTag::insert($tags);
 
-        return $this->responseJson(201, "Success add tag", []);
+        CollectiveTag::insert($tags);
+
+        return $this->responseJson(201, "Success add tag", $tags);
     }
 }

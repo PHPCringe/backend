@@ -6,19 +6,21 @@ use Illuminate\Http\Request;
 use App\Models\CollectiveMember;
 use Illuminate\Validation\Rules\Enum;
 use App\Enums\OrganizationMemberTypes;
+use App\Models\Collective;
+use App\Models\User;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Validator;
 
 class CollectiveMemberController extends Controller
 {
-    public function index()
+    public function index(string $collectiveName)
     {
-        $collectiveMember = CollectiveMember::all();
-        return $this->responseJson(200, "Success", $collectiveMember);
-    }
+        $collectiveMembers = User::with(['collective.members'])
+            ->where('username', $collectiveName)
+            ->get()
+            ->makeHidden(['collective']);
 
-    public function create()
-    {
-        //
+        return $this->responseJson(200, "Success", $collectiveMembers);
     }
 
     public function addMember(Request $request)
@@ -62,7 +64,7 @@ class CollectiveMemberController extends Controller
     {
         // $collectiveMember = CollectiveMember::where('collective_id', $request->collective_id)->where('user_id', $request->user_id)->delete();
         $collectiveMember = CollectiveMember::find($request->route('member'));
-        if($collectiveMember == null) {
+        if ($collectiveMember == null) {
             return $this->responseJson(404, "Member not found");
         }
         $collectiveMember->delete();

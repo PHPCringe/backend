@@ -66,11 +66,11 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
             Route::get('/{expense}', [TransactionExpenseController::class, 'show']);
             Route::post('/', [TransactionExpenseController::class, 'store'])->middleware('auth:sanctum');
         });
-    });
 
-    Route::prefix('member/collective')->group(function () {
-        Route::get('/', [CollectiveMemberController::class, 'index']);
-        Route::post('/', [CollectiveMemberController::class, 'addMember']);
-        Route::delete('/{member}', [CollectiveMemberController::class, 'removeMember']);
+        Route::prefix('/members')->group(function () {
+            Route::get('/', [CollectiveMemberController::class, 'index']);
+            Route::post('/', [CollectiveMemberController::class, 'addMember']);
+            Route::delete('/{member}', [CollectiveMemberController::class, 'removeMember']);
+        });
     });
 });

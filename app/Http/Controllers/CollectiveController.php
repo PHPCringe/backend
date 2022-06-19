@@ -17,7 +17,7 @@ class CollectiveController extends Controller
 {
     public function index()
     {
-        $collectives = Collective::all();
+        $collectives = Collective::paginate();
         return $this->responseJson(201, 'Collectives Founds', [
             'collectives' => $collectives
         ]);
@@ -91,12 +91,6 @@ class CollectiveController extends Controller
 
         return $this->responseJson(200, 'Collective data found', $collective);
     }
-
-    public function update(Request $request, Collective $collective)
-    {
-        //
-    }
-    
     public function destroy(Collective $collective)
     {
         $collective->delete();

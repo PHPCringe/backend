@@ -15,12 +15,16 @@ class CurrencySeeder extends Seeder
      */
     public function run()
     {
-        Currency::insert([
-            'name' => 'USD',
-            'symbol' => '$'
-        ], [
-            'name' => 'IDR',
-            'symbol' => 'Rp'
-        ]);
+        $currencies = [
+            ['USD', '$'],
+            ['IDR', 'Rp']
+        ];
+
+        foreach ($currencies as $currency) {
+            Currency::create([
+                'name' => $currency[0],
+                'symbol' => $currency[1]
+            ]);
+        }
     }
 }
